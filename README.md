@@ -2,7 +2,7 @@
 
 The project implements the Identity Reconciliation logic
 
-The API consolidates customer contact information across multiple records and determines primary and secondary contacts.
+A Node backend service that implements identity reconciliation which receives email/phone, merges contacts, and returns consolidated results.
 
 ---
 
@@ -18,7 +18,21 @@ POST /identify
 
 ---
 
-## API Usage
+## Run Locally
+
+1. Clone the repo
+2. Add MySQL credentials in .env file (use .env.example)
+3. Install dependencies:
+   npm install
+4. Run locally:
+   npm run dev
+   
+## How It Works
+
+- If no matching contact: create new primary.
+- If match exists: consolidate identity.
+- If both email and phone differ but match two primaries:
+  it links the newer as secondary under the older.
 
 ### Request (JSON Body Required)
 
