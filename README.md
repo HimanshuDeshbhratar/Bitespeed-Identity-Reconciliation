@@ -1,86 +1,41 @@
-# Bitespeed Identify API
+# Bitespeed Identity Reconciliation API
 
-Customer identity consolidation service that links contacts across multiple purchases using email and phone number.
+The project implements the Identity Reconciliation logic
 
-## Prerequisites
+The API consolidates customer contact information across multiple records and determines primary and secondary contacts.
 
-- Node.js 18+
-- MySQL 8+
+---
 
-## Setup
+## Live API
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
+Base URL:
 
-2. **Create MySQL database**
-   ```bash
-   mysql -u root -p < database/schema.sql
-   ```
-   Or run the SQL in `database/schema.sql` manually in MySQL Workbench or your MySQL client.
+https://bitespeed-identity-reconciliation-0jl3.onrender.com
 
-3. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` with your MySQL credentials:
-   ```
-   PORT=3000
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_USER=root
-   DB_PASSWORD=your_password
-   DB_NAME=bitespeed
-   ```
+Endpoint:
 
-## Run
+POST /identify
 
-**Development** (with auto-reload):
+---
+
+## API Usage
+
+### Request (JSON Body Required)
+
 ```bash
-npm run dev
-```
+curl -X POST https://bitespeed-identity-reconciliation-0jl3.onrender.com/identify \
+-H "Content-Type: application/json" \
+-d '{"email":"test@example.com","phoneNumber":"123456"}'
 
-**Production**:
+```
+## Expected Response
 ```bash
-npm run build
-npm start
-```
-
-## API
-
-### POST /identify
-
-Identifies or creates a contact and returns consolidated contact info.
-
-**Request:**
-```json
-{
-  "email": "mcfly@hillvalley.edu",
-  "phoneNumber": "123456"
-}
-```
-
-- `email` (optional): Customer email
-- `phoneNumber` (optional): Customer phone number
-- At least one of `email` or `phoneNumber` must be provided
-
-**Response:**
-```json
 {
   "contact": {
-    "primaryContatctId": 1,
-    "emails": ["lorraine@hillvalley.edu", "mcfly@hillvalley.edu"],
+    "primaryContactId": 1,
+    "emails": ["test@example.com"],
     "phoneNumbers": ["123456"],
-    "secondaryContactIds": [23]
+    "secondaryContactIds": []
   }
 }
-```
-
-## Example
-
-```bash
-curl -X POST http://localhost:3000/identify \
-  -H "Content-Type: application/json" \
-  -d '{"email":"mcfly@hillvalley.edu","phoneNumber":"123456"}'
 ```
