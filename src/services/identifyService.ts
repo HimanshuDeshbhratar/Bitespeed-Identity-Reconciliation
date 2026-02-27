@@ -38,7 +38,7 @@ export async function identifyContact(
     }
 
     const [matchingRows] = await conn.execute<RowDataPacket[]>(
-      `SELECT * FROM Contact WHERE ${conditions.join(' OR ')} ORDER BY createdAt ASC`,
+      `SELECT * FROM contact WHERE ${conditions.join(' OR ')} ORDER BY createdAt ASC`,
       params
     );
 
@@ -53,7 +53,7 @@ export async function identifyContact(
 
     if (matchingContacts.length === 0) {
       const [insertResult] = await conn.execute<ResultSetHeader>(
-        `INSERT INTO Contact (phoneNumber, email, linkedId, linkPrecedence) 
+        `INSERT INTO contact (phoneNumber, email, linkedId, linkPrecedence) 
          VALUES (?, ?, NULL, 'primary')`,
         [phoneNumber || null, email || null]
       );
@@ -82,7 +82,7 @@ export async function identifyContact(
     const primaryIdArray = Array.from(primaryIds);
     const placeholders = primaryIdArray.map(() => '?').join(',');
     const [primaryRows] = await conn.execute<RowDataPacket[]>(
-      `SELECT * FROM Contact WHERE id IN (${placeholders}) AND linkPrecedence = 'primary' ORDER BY createdAt ASC`,
+      `SELECT * FROM contact WHERE id IN (${placeholders}) AND linkPrecedence = 'primary' ORDER BY createdAt ASC`,
       primaryIdArray
     );
 
@@ -93,7 +93,7 @@ export async function identifyContact(
       for (let i = 1; i < primaries.length; i++) {
         const secondaryPrimary = primaries[i];
         await conn.execute(
-          `UPDATE Contact SET linkedId = ?, linkPrecedence = 'secondary', updatedAt = NOW() 
+          `UPDATE contact SET linkedId = ?, linkPrecedence = 'secondary', updatedAt = NOW() 
            WHERE id = ? OR linkedId = ?`,
           [oldestPrimary.id, secondaryPrimary.id, secondaryPrimary.id]
         );
@@ -101,7 +101,7 @@ export async function identifyContact(
     }
 
     const [allLinkedRows] = await conn.execute<RowDataPacket[]>(
-      `SELECT * FROM Contact 
+      `SELECT * FROM contact 
        WHERE (id = ? OR linkedId = ?) AND deletedAt IS NULL 
        ORDER BY linkPrecedence ASC, createdAt ASC`,
       [oldestPrimary.id, oldestPrimary.id]
@@ -122,13 +122,13 @@ export async function identifyContact(
       const secondaryPhone = phoneNumber || null;
 
       await conn.execute(
-        `INSERT INTO Contact (phoneNumber, email, linkedId, linkPrecedence) 
+        `INSERT INTO contact (phoneNumber, email, linkedId, linkPrecedence) 
          VALUES (?, ?, ?, 'secondary')`,
         [secondaryPhone, secondaryEmail, oldestPrimary.id]
       );
 
       const [refetchedRows] = await conn.execute<RowDataPacket[]>(
-        `SELECT * FROM Contact 
+        `SELECT * FROM contact 
          WHERE (id = ? OR linkedId = ?) AND deletedAt IS NULL 
          ORDER BY linkPrecedence ASC, createdAt ASC`,
         [oldestPrimary.id, oldestPrimary.id]
