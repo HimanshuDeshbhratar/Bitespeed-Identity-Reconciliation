@@ -9,8 +9,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use('/identify', identifyRouter);
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
+// app.get('/health', (_req, res) => {
+//   res.json({ status: 'ok' });
+// });
+
+app.get('/', (_req, res) => {
+  res.json({ message: "Bitespeed Identify API is running" });
 });
 
 const startServer = async () => {
